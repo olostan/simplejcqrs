@@ -57,6 +57,7 @@ public abstract class AggregateRoot {
 			if (params.length == 1 && params[0] == event.getClass()) {
 				try {
 					method.invoke(this,event);
+					break;
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Could not call apply method with one argument",e);
@@ -66,7 +67,7 @@ public abstract class AggregateRoot {
 				} catch (InvocationTargetException e) {
 					e.printStackTrace();
 					throw new RuntimeException("There was error while invoking apply mehtod",e);
-				}
+				}				
 			}
 		}		
 	}
