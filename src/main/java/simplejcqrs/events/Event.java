@@ -16,5 +16,10 @@ public class Event {
 		super();
 		this.aggregateRootId = aggregateRootId;
 	}
+
+	public String getAggregateRootId() {
+		return aggregateRootId;
+	}
+	
 	
 }
