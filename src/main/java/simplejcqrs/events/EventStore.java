@@ -1,7 +1,5 @@
 package simplejcqrs.events;
 
-import java.util.Collection;
-
 import simplejcqrs.domain.AggregateRoot;
 
 public interface EventStore {

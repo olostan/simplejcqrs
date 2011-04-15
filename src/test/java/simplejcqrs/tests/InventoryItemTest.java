@@ -2,27 +2,19 @@ package simplejcqrs.tests;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.RuntimeErrorException;
+import junit.framework.TestCase;
 
 import org.junit.Test;
-
-import com.google.inject.Binder;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Module;
 
 import simplejcqrs.commandhandlers.CommandHandler;
 import simplejcqrs.commandhandlers.InventoryCommandHandlers;
 import simplejcqrs.commands.Command;
-import simplejcqrs.commands.CommandSender;
 import simplejcqrs.commands.InventoryCommands;
 import simplejcqrs.domain.AggregateRoot;
 import simplejcqrs.domain.Repository;
@@ -30,13 +22,18 @@ import simplejcqrs.events.Event;
 import simplejcqrs.events.EventPublisher;
 import simplejcqrs.events.EventStore;
 import simplejcqrs.events.InventoryEvents;
-import simplejcqrs.events.InventoryEvents.InventoryItemCreated;
 import simplejcqrs.structural.EventBus;
 import simplejcqrs.structural.EventHandler;
 
-import junit.framework.TestCase;
+import com.google.inject.Binder;
+import com.google.inject.Guice;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Singleton;
 
 public class InventoryItemTest extends TestCase {
+	@Singleton
 	private static class TestEventStore implements EventStore {
 		
 		private final EventPublisher publisher;
@@ -54,6 +51,7 @@ public class InventoryItemTest extends TestCase {
 		}
 		private final Map<String,LinkedList<EventStoreData>> current = new HashMap<String,LinkedList<EventStoreData>>();
 		
+		@Inject
 		public TestEventStore(EventPublisher publisher) {
 			super();
 			this.publisher = publisher;
@@ -120,6 +118,7 @@ public class InventoryItemTest extends TestCase {
 		}
 		
 	}
+	@Singleton
 	private static class TestRepository implements Repository {
 		private EventStore store;
 		
@@ -166,7 +165,7 @@ public class InventoryItemTest extends TestCase {
 			}			
 		}
 	}
-
+	@Singleton
 	private static class TestEventBus extends EventBus {
 		
 		private Map<Class<?>,List<Handler> > handlerRegistry = new HashMap<Class<?>,List<Handler>>();
@@ -174,6 +173,7 @@ public class InventoryItemTest extends TestCase {
 		@Override
 		public void publish(Event event) 
 		{
+			System.out.println("Publishing event:"+event.getClass().getName());
 			List<Handler> handlers = handlerRegistry.get(event.getClass());
 			if (handlers == null || handlers.size()==0) return;
 			for(Handler handler : handlers) handler.Invoke(event);
@@ -182,6 +182,7 @@ public class InventoryItemTest extends TestCase {
 		@Override
 		public void send(Command command) 
 		{
+			System.out.println("sending command:"+command.getClass().getName());
 			List<Handler> handlers = handlerRegistry.get(command.getClass());
 			if (handlers == null) throw new RuntimeException("No command handlers registred for command ");
 			if (handlers.size()!=1) throw new RuntimeException("There should be only one command handler");
@@ -209,7 +210,7 @@ public class InventoryItemTest extends TestCase {
 				handlerRegistry.put(type, registred);
 			}
 			Handler handler = new Handler();
-			handler.instance = handler;
+			handler.instance = instance;
 			handler.method = m;
 			registred.add(handler);
 		}
@@ -219,7 +220,9 @@ public class InventoryItemTest extends TestCase {
 		@Override
 		public void configure(Binder binder) {
 			binder.bind(EventBus.class).to(TestEventBus.class);
+			binder.bind(EventPublisher.class).to(TestEventBus.class);
 			binder.bind(Repository.class).to(TestRepository.class);
+			binder.bind(EventStore.class).to(TestEventStore.class);
 		}
 	}
 	private class CreationTestingHandler {
