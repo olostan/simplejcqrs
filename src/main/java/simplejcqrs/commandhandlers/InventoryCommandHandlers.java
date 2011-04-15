@@ -12,6 +12,7 @@ public class InventoryCommandHandlers {
 		this.repository = repository;
 	}
 	
+	@CommandHandler
 	public void Handle(CreateInventoryItem message)
     {
 		InventoryItem item = new InventoryItem(message.getInventoryId(), message.getName());

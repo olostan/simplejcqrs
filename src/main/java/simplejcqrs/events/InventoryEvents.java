@@ -1,6 +1,6 @@
 package simplejcqrs.events;
 
-final class IntentoryEvents {
+public final class InventoryEvents {
 	 public class InventoryItemCreated extends Event {
 		public final String name;
 

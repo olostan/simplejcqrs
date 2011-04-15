@@ -1,9 +1,9 @@
 package simplejcqrs.commands;
 
 public abstract class InventoryCommands {
-	private static abstract class IntentoryCommand {
+	private static abstract class InventoryCommand extends Command {
 		private final String inventoryId;
-		public IntentoryCommand(String inventoryId) {
+		public InventoryCommand(String inventoryId) {
 			super();
 			this.inventoryId = inventoryId;
 		}
@@ -13,7 +13,7 @@ public abstract class InventoryCommands {
 		
 		
 	}
-	public static class CreateInventoryItem extends IntentoryCommand {
+	public static class CreateInventoryItem extends InventoryCommand {
 		private final String name;
 
 		public CreateInventoryItem(String inventoryId, String name) {

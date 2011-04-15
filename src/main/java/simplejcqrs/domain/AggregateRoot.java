@@ -36,8 +36,8 @@ public abstract class AggregateRoot {
 	public void clearChanges() {
 		changes.clear();
 	}
-	public void loadFromHistory(Collection<Event> history) {
-		for (Event event : history) {
+	public void loadFromHistory(Iterable<Event> events) {
+		for (Event event : events) {
 			ApplyChange(event,false);
 		}
 	}
