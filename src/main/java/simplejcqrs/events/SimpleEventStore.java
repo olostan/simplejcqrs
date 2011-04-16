@@ -7,7 +7,6 @@ import java.util.Map;
 
 import simplejcqrs.domain.AggregateRoot;
 
-import com.google.inject.ImplementedBy;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 

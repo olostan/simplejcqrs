@@ -1,11 +1,10 @@
 package simplejcqrs.structural;
 
-import com.google.inject.ImplementedBy;
-
 import simplejcqrs.commands.CommandSender;
 import simplejcqrs.events.EventPublisher;
 import simplejcqrs.events.SimpleEventBus;
-import simplejcqrs.events.SimpleEventStore;
+
+import com.google.inject.ImplementedBy;
 
 @ImplementedBy(SimpleEventBus.class)
 public abstract class EventBus implements EventPublisher, CommandSender 

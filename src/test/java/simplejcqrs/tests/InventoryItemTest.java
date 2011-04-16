@@ -7,19 +7,12 @@ import org.junit.Test;
 import simplejcqrs.commandhandlers.InventoryCommandHandlers;
 import simplejcqrs.commands.InventoryCommands;
 import simplejcqrs.domain.Repository;
-import simplejcqrs.events.EventPublisher;
-import simplejcqrs.events.EventStore;
 import simplejcqrs.events.InventoryEvents;
-import simplejcqrs.events.SimpleEventBus;
-import simplejcqrs.events.SimpleEventStore;
-import simplejcqrs.structural.EventBasedRepository;
 import simplejcqrs.structural.EventBus;
 import simplejcqrs.structural.EventHandler;
 
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 
 public class InventoryItemTest extends TestCase {
 	

@@ -1,8 +1,8 @@
 package simplejcqrs.events;
 
-import com.google.inject.ImplementedBy;
-
 import simplejcqrs.domain.AggregateRoot;
+
+import com.google.inject.ImplementedBy;
 
 @ImplementedBy(SimpleEventStore.class)
 public interface EventStore {
