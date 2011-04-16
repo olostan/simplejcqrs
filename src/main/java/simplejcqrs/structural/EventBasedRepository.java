@@ -27,15 +27,21 @@ public class EventBasedRepository implements Repository {
 			return root;
 		} catch (InstantiationException e) {
 			e.printStackTrace();
+			throw new RuntimeException("Can't create aggregate root class: instantiation",e);
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+			throw new RuntimeException("Can't create and load aggregate root class: no access",e);
 		}			
-		return null;
 	}
 
 	@Override
 	public void save(AggregateRoot root, int expectedVersion) {
 		store.saveEvents(root.getClass(), root.getId(), root.getChanges(), expectedVersion);
+	}
+
+	@Override
+	public <T extends AggregateRoot> boolean exists(Class<T> rootClass, String id) {
+		return store.hasEventsForAggregate(rootClass, id);
 	}
 	
 }

@@ -49,7 +49,7 @@ public class SimpleEventStore implements EventStore {
 			versionCounter++;
 			event.setAggregateVersion(versionCounter);			
 			rootEvents.add(new EventStoreData(event, versionCounter));
-			publisher.publish(event);
+			publisher.publish(event, aggregateId);
 		}		
 	}
 	private class EventStoreDataIterator implements Iterator<Event> {
@@ -91,6 +91,12 @@ public class SimpleEventStore implements EventStore {
 			}
 			
 		};
+	}
+
+	@Override
+	public boolean hasEventsForAggregate(
+			Class<? extends AggregateRoot> rootClass, String id) {
+		return current.containsKey(id);
 	}
 	
 }
