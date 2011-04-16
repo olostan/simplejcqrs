@@ -28,7 +28,6 @@ public class SimpleEventBus extends EventBus {
 			} catch (IllegalAccessException e) {
 				e.printStackTrace();
 			} catch (InvocationTargetException e) {
-				e.getTargetException().printStackTrace();
 				throw new Error("Exception while calling handler",e);
 			}			
 		}
@@ -48,8 +47,8 @@ public class SimpleEventBus extends EventBus {
 	public void send(Command command) 
 	{
 		List<Handler> handlers = handlerRegistry.get(command.getClass());
-		if (handlers == null) throw new RuntimeException("No command handlers registred for command ");
-		if (handlers.size()!=1) throw new RuntimeException("There should be only one command handler");
+		if (handlers == null) throw new RuntimeException("No command handlers registred for command "+command.getClass().getName());
+		if (handlers.size()!=1) throw new RuntimeException("There should be only one handler for command "+command.getClass().getName());
 		handlers.get(0).Invoke(command);			
 	}		
 

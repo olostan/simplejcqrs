@@ -1,12 +1,16 @@
 package simplejcqrs.commandhandlers;
 
+import com.google.inject.Inject;
+
 import simplejcqrs.commands.InventoryCommands.CreateInventoryItem;
 import simplejcqrs.domain.InventoryItem;
 import simplejcqrs.domain.Repository;
 
+@CommandHandler
 public class InventoryCommandHandlers {
 	private final Repository repository;
 
+	@Inject
 	public InventoryCommandHandlers(Repository repository) {
 		super();
 		this.repository = repository;

@@ -11,92 +11,71 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 @Singleton 
-public class SimpleEventStore implements EventStore {
+public class PublishingEventStore implements EventStore {
 	
 	private final EventPublisher publisher;
+	private final EventStore underlying;
 	
-	private static class EventStoreData {
-		public final Event event;
-		public int version;
-		public EventStoreData(Event event, int version) {
-			super();
-			this.event = event;
-			this.version = version;
-		}					
-	}
-	private final Map<String,LinkedList<SimpleEventStore.EventStoreData>> current = new HashMap<String,LinkedList<SimpleEventStore.EventStoreData>>();
+	//private final Map<String,LinkedList<PublishingEventStore.EventStoreData>> current = new HashMap<String,LinkedList<PublishingEventStore.EventStoreData>>();
 	
 	@Inject
-	public SimpleEventStore(EventPublisher publisher) {
+	public PublishingEventStore(EventPublisher publisher, EventStore underlyingStore) {
 		super();
 		this.publisher = publisher;
+		this.underlying = underlyingStore;
 	}
 
 	@Override
 	public void saveEvents(Class<? extends AggregateRoot> rootClass,
 			String aggregateId, Iterable<Event> events,
 			int expectedVersion) {
-		LinkedList<SimpleEventStore.EventStoreData> rootEvents = current.get(aggregateId);
+		/*
+		LinkedList<PublishingEventStore.EventStoreData> rootEvents = current.get(aggregateId);
 		if (rootEvents==null) {
-			rootEvents = new LinkedList<SimpleEventStore.EventStoreData>();
+			rootEvents = new LinkedList<PublishingEventStore.EventStoreData>();
 			current.put(aggregateId, rootEvents);
 		}					
 		else if (expectedVersion != -1 && rootEvents.getLast().version != expectedVersion) {
 			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": "+rootEvents.getLast().version+" != "+expectedVersion);
-		}
+		}*/
+		if (!checkVersion(rootClass, aggregateId, expectedVersion))
+			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": expecting version "+expectedVersion);		
+		
 		int versionCounter = expectedVersion;
 		for(Event event : events) {
 			versionCounter++;
 			event.setAggregateVersion(versionCounter);			
-			rootEvents.add(new EventStoreData(event, versionCounter));
+			//rootEvents.add(new EventStoreData(event, versionCounter));
 			publisher.publish(event, aggregateId);
-		}		
+		}
+		underlying.saveEvents(rootClass, aggregateId, events, expectedVersion);
 	}
-	private class EventStoreDataIterator implements Iterator<Event> {
-		//private final Collection<EventStoreData> events;
-		private final Iterator<SimpleEventStore.EventStoreData> iterator; 
-
-		@Override
-		public boolean hasNext() {				
-			return iterator.hasNext();
-		}
-
-		@Override
-		public Event next() {				
-			return iterator.next().event;
-		}
-
-		@Override
-		public void remove() {
-			iterator.remove();				
-		}
-
-		public EventStoreDataIterator(Iterator<SimpleEventStore.EventStoreData> iterator) {
-			super();
-			this.iterator = iterator;
-		}
-		
-	}
-	@Override
+	
+	@Override	
 	public Iterable<Event> getEventsForAggregate(
 			Class<? extends AggregateRoot> rootClass, String id) 
 	{
-		final LinkedList<SimpleEventStore.EventStoreData> rootEvents = current.get(id);
+		final LinkedList<PublishingEventStore.EventStoreData> rootEvents = current.get(id);
 		if (rootEvents == null)
 			throw new RuntimeException("Aggregate not found");			
 		return new Iterable<Event>() {
 			@Override
 			public Iterator<Event> iterator() {
 				return new EventStoreDataIterator(rootEvents.iterator());
-			}
-			
+			}			
 		};
 	}
 
 	@Override
 	public boolean hasEventsForAggregate(
 			Class<? extends AggregateRoot> rootClass, String id) {
-		return current.containsKey(id);
+		return underlying.hasEventsForAggregate(rootClass, id);
+	}
+
+	@Override
+	public boolean checkVersion(Class<? extends AggregateRoot> rootClass,
+			String id, int version) {
+		return underlying.checkVersion(rootClass, id, version);
 	}
 	
 }

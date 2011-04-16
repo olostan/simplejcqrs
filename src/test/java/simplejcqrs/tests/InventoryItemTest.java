@@ -1,18 +1,29 @@
 package simplejcqrs.tests;
 
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
+import simplejcqrs.commandhandlers.CommandHandler;
+import simplejcqrs.commandhandlers.HouseCommandHandlers;
 import simplejcqrs.commandhandlers.InventoryCommandHandlers;
+import simplejcqrs.commands.HouseCommands;
 import simplejcqrs.commands.InventoryCommands;
 import simplejcqrs.domain.Repository;
 import simplejcqrs.events.InventoryEvents;
 import simplejcqrs.structural.EventBus;
 import simplejcqrs.structural.EventHandler;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Binder;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
+import com.google.inject.multibindings.Multibinder;
 
 public class InventoryItemTest extends TestCase {
 	
@@ -37,14 +48,33 @@ public class InventoryItemTest extends TestCase {
 			assertFalse("Expecting "+expectingName+" ("+expectingId+")",called);
 		}
 	}
+	private final class TestModule extends AbstractModule {
+		@Override
+		public void configure() {
+			Multibinder<Object> m = Multibinder.newSetBinder(binder(), Object.class, CommandHandler.class);
+			m.addBinding().to(InventoryCommandHandlers.class);
+			m.addBinding().to(HouseCommandHandlers.class);
+		}
+		
+	}	
+	
+	private EventBus createBus() {
+		Injector injector = Guice.createInjector(new TestModule());
+		EventBus bus  = injector.getInstance(EventBus.class);		  
+		TypeLiteral<Set<Object>> t = new TypeLiteral<Set<Object>>() {};
+		
+		Set<Object> handlers = injector.getInstance(Key.get(t,CommandHandler.class));
+		for (Object handler : handlers) {
+			bus.registerHandler(handler);
+		}
+		return bus;
+	}
 
 
 	@Test
 	public void testCreateInventoryOneItem() {
-		Injector injector = Guice.createInjector();
-		EventBus bus  = injector.getInstance(EventBus.class);
-		Repository repository = injector.getInstance(Repository.class);
-		bus.registerHandler(new InventoryCommandHandlers(repository));
+		
+		EventBus bus = createBus();
 		
 		final String inventoryId = "id1";
 		final String inventoryName = "name1";
@@ -56,11 +86,8 @@ public class InventoryItemTest extends TestCase {
 	}
 	@Test
 	public void testCreateInventoryTwoItem() {
-		Injector injector = Guice.createInjector();
-		EventBus bus  = injector.getInstance(EventBus.class);
-		Repository repository = injector.getInstance(Repository.class);
-		bus.registerHandler(new InventoryCommandHandlers(repository));
-		
+		EventBus bus  = createBus();
+				
 		final String inventoryId = "id1";
 		final String inventoryName = "name1";
 		final CreationTestingHandler testing = new CreationTestingHandler(inventoryId, inventoryName);
@@ -72,6 +99,7 @@ public class InventoryItemTest extends TestCase {
 		bus.registerHandler(testing);
 		bus.registerHandler(testing2);
 		bus.send(new InventoryCommands.CreateInventoryItem(inventoryId, inventoryName));
+		bus.send(new HouseCommands.CreateHouse(inventoryId, inventoryName));
 		bus.send(new InventoryCommands.CreateInventoryItem(inventoryId2, inventoryName2));
 		testing.AssertCalled();
 		testing2.AssertCalled();
