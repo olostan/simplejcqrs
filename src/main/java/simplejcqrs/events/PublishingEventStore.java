@@ -1,14 +1,10 @@
 package simplejcqrs.events;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-
 import simplejcqrs.domain.AggregateRoot;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 @Singleton 
 public class PublishingEventStore implements EventStore {
@@ -19,7 +15,7 @@ public class PublishingEventStore implements EventStore {
 	//private final Map<String,LinkedList<PublishingEventStore.EventStoreData>> current = new HashMap<String,LinkedList<PublishingEventStore.EventStoreData>>();
 	
 	@Inject
-	public PublishingEventStore(EventPublisher publisher, EventStore underlyingStore) {
+	public PublishingEventStore(EventPublisher publisher,@Named("ActualStore")  EventStore underlyingStore) {
 		super();
 		this.publisher = publisher;
 		this.underlying = underlyingStore;
@@ -38,7 +34,7 @@ public class PublishingEventStore implements EventStore {
 		else if (expectedVersion != -1 && rootEvents.getLast().version != expectedVersion) {
 			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": "+rootEvents.getLast().version+" != "+expectedVersion);
 		}*/
-		if (!checkVersion(rootClass, aggregateId, expectedVersion))
+		if (expectedVersion!=-1 && !checkVersion(rootClass, aggregateId, expectedVersion))
 			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": expecting version "+expectedVersion);		
 		
 		int versionCounter = expectedVersion;
@@ -55,15 +51,7 @@ public class PublishingEventStore implements EventStore {
 	public Iterable<Event> getEventsForAggregate(
 			Class<? extends AggregateRoot> rootClass, String id) 
 	{
-		final LinkedList<PublishingEventStore.EventStoreData> rootEvents = current.get(id);
-		if (rootEvents == null)
-			throw new RuntimeException("Aggregate not found");			
-		return new Iterable<Event>() {
-			@Override
-			public Iterator<Event> iterator() {
-				return new EventStoreDataIterator(rootEvents.iterator());
-			}			
-		};
+		return underlying.getEventsForAggregate(rootClass, id);
 	}
 
 	@Override
