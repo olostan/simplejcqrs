@@ -1,12 +1,12 @@
 package simplejcqrs.domain;
 
-public class House extends AggregateRoot {
-	@SuppressWarnings("unused")
-	private String address;
+import simplejcqrs.events.HouseEvents;
 
+public class House extends AggregateRoot {
+	
 	public House(String id, String address) {
 		super(id);
-		this.address = address;
+		ApplyChange(new HouseEvents.HouseCreated(address));
 	}
 	
 	
