@@ -3,6 +3,7 @@ package simplejcqrs.commands;
 import java.io.Serializable;
 
 public final class HouseCommands {
+	@SuppressWarnings("serial")
 	public static class HouseCommand extends Command  implements Serializable{
 		private String houseId;
 
@@ -19,6 +20,7 @@ public final class HouseCommands {
 		}
 	}
 	
+	@SuppressWarnings("serial")
 	public static class CreateHouse extends HouseCommand implements Serializable{
 		private String address;
 
