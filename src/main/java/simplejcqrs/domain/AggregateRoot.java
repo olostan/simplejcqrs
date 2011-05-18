@@ -10,16 +10,16 @@ import simplejcqrs.events.Event;
 public abstract class AggregateRoot {
 	private final LinkedList<Event> changes = new LinkedList<Event>();
 	
-	private final String id;
+	private final long id;
 	private int version;
 			
-	public AggregateRoot(String id) {
+	public AggregateRoot(long id) {
 		super();
 		this.id = id;
 	}
 	
 		
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
