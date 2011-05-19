@@ -5,18 +5,18 @@ import java.io.Serializable;
 public final class HouseCommands {
 	@SuppressWarnings("serial")
 	public static class HouseCommand extends Command  implements Serializable{
-		private String houseId;
+		private long houseId;
 
-		public HouseCommand(String houseId) {
+		public HouseCommand(long houseId) {
 			super();
 			this.houseId = houseId;
 		}
-		public String getHouseId() {
+		public long getHouseId() {
 			return houseId;
 		}	
 		public HouseCommand() {
 			super();
-			this.houseId = "[none]";
+			this.houseId = -1;
 		}
 	}
 	
@@ -24,7 +24,7 @@ public final class HouseCommands {
 	public static class CreateHouse extends HouseCommand implements Serializable{
 		private String address;
 
-		public CreateHouse(String houseId, String address) {
+		public CreateHouse(long houseId, String address) {
 			super(houseId);
 			this.address = address;
 		}
@@ -32,7 +32,7 @@ public final class HouseCommands {
 			return address;
 		}
 		public CreateHouse() {
-			super("[none]");
+			super(-1);
 			address = "[none]";
 		}						
 	}

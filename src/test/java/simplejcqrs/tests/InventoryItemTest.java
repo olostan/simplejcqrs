@@ -37,22 +37,22 @@ public class InventoryItemTest extends TestCase {
 	}
 	
 	public static class InventoryItemCreationTestHandler extends TestHandler{
-		private final String expectingId;
+		private final long expectingId;
 		private final String expectingName;
 				
-		public InventoryItemCreationTestHandler(String expectingId, String expectingName) {
+		public InventoryItemCreationTestHandler(long expectingId, String expectingName) {
 			super();
 			this.expectingId = expectingId;
 			this.expectingName = expectingName;
 		}
 		@EventHandler
-		public void handleInventoryItemCreated(InventoryEvents.InventoryItemCreated event, String Id) {			
-			if (event.name.equals(expectingName) && Id.equals(expectingId)) {
+		public void handleInventoryItemCreated(InventoryEvents.InventoryItemCreated event, long Id) {			
+			if (event.name.equals(expectingName) && Id==expectingId) {
 				assertFalse("Creation handler should be called only once",called);
 				called = true;
 			}
 		}
-		public String getExpectingId() {
+		public long getExpectingId() {
 			return expectingId;
 		}
 		public String getExpectingName() {
@@ -61,23 +61,23 @@ public class InventoryItemTest extends TestCase {
 		
 	}
 	public static class HouseCreationTestHandler extends TestHandler {
-		private final String expectingId;
+		private final long expectingId;
 		private final String expectingAddress;
-		public HouseCreationTestHandler(String expectingId,
+		public HouseCreationTestHandler(long expectingId,
 				String expectingAddress) {
 			super();
 			this.expectingId = expectingId;
 			this.expectingAddress = expectingAddress;
 		}
-		public String getExpectingId() {
+		public long getExpectingId() {
 			return expectingId;
 		}
 		public String getExpectingAddress() {
 			return expectingAddress;
 		}
 		@EventHandler 
-		public void handleHouseCreated(HouseEvents.HouseCreated event, String id) {
-			if (event.getAddress().equals(expectingAddress) && id.equals(expectingId)) {
+		public void handleHouseCreated(HouseEvents.HouseCreated event, long id) {
+			if (event.getAddress().equals(expectingAddress) && id==expectingId) {
 				assertFalse("Creation handler should be called only once",called);
 				called = true;
 			}
@@ -116,7 +116,7 @@ public class InventoryItemTest extends TestCase {
 		
 		EventBus bus = createBus();
 		
-		final String inventoryId = "id1";
+		final long inventoryId = 123;
 		final String inventoryName = "name1";
 		final InventoryItemCreationTestHandler testing = new InventoryItemCreationTestHandler(inventoryId, inventoryName);
 
@@ -128,13 +128,13 @@ public class InventoryItemTest extends TestCase {
 	public void testCreateInventoryTwoItem() {
 		EventBus bus  = createBus();
 				
-		final InventoryItemCreationTestHandler testing = new InventoryItemCreationTestHandler("id1", "name1");
-		final InventoryItemCreationTestHandler testing2 = new InventoryItemCreationTestHandler("id2", "name2");
+		final InventoryItemCreationTestHandler testing = new InventoryItemCreationTestHandler(111, "name1");
+		final InventoryItemCreationTestHandler testing2 = new InventoryItemCreationTestHandler(222, "name2");
 
 		bus.registerHandler(testing);
 		bus.registerHandler(testing2);
 		bus.send(new InventoryCommands.CreateInventoryItem(testing.getExpectingId(), testing.getExpectingName()));
-		bus.send(new HouseCommands.CreateHouse("h1", "a1"));
+		bus.send(new HouseCommands.CreateHouse(333, "a1"));
 		bus.send(new InventoryCommands.CreateInventoryItem(testing2.getExpectingId(), testing2.getExpectingName()));
 		testing.AssertCalled();
 		testing2.AssertCalled();
@@ -144,8 +144,8 @@ public class InventoryItemTest extends TestCase {
 	public void testCreateDublicateInventoryItem() {
 		EventBus bus  = createBus();
 
-		final InventoryItemCreationTestHandler testing = new InventoryItemCreationTestHandler("id1", "name1");
-		final InventoryItemCreationTestHandler testing2 = new InventoryItemCreationTestHandler("id1", "name2");	
+		final InventoryItemCreationTestHandler testing = new InventoryItemCreationTestHandler(777, "name1");
+		final InventoryItemCreationTestHandler testing2 = new InventoryItemCreationTestHandler(777, "name2");	
 
 		bus.registerHandler(testing);
 		bus.registerHandler(testing2);
@@ -164,8 +164,8 @@ public class InventoryItemTest extends TestCase {
 	public void testCreateDifferentAggregates() {
 		EventBus bus = createBus();
 		
-		final InventoryItemCreationTestHandler invHandler = new InventoryItemCreationTestHandler("invid1", "invname1");
-		final HouseCreationTestHandler houseHandler = new HouseCreationTestHandler("house id1", "Some address");
+		final InventoryItemCreationTestHandler invHandler = new InventoryItemCreationTestHandler(444, "invname1");
+		final HouseCreationTestHandler houseHandler = new HouseCreationTestHandler(3333, "Some address");
 		bus.registerHandler(invHandler);
 		bus.registerHandler(houseHandler);
 		

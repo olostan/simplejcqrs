@@ -19,7 +19,7 @@ public class EventBasedRepository implements Repository {
 	}
 
 	@Override
-	public <T extends AggregateRoot> T load(Class<T> rootClass, String id) {
+	public <T extends AggregateRoot> T load(Class<T> rootClass, long id) {
 		try {
 			T root = rootClass.newInstance();
 			Iterable<Event> events = store.getEventsForAggregate(rootClass, id);
@@ -40,7 +40,7 @@ public class EventBasedRepository implements Repository {
 	}
 
 	@Override
-	public <T extends AggregateRoot> boolean exists(Class<T> rootClass, String id) {
+	public <T extends AggregateRoot> boolean exists(Class<T> rootClass, long id) {
 		return store.hasEventsForAggregate(rootClass, id);
 	}
 	

@@ -3,12 +3,12 @@ package simplejcqrs.commands;
 public final class InventoryCommands {
 	@SuppressWarnings("serial")
 	private static abstract class InventoryCommand extends Command {
-		private final String inventoryId;
-		public InventoryCommand(String inventoryId) {
+		private final long inventoryId;
+		public InventoryCommand(long inventoryId) {
 			super();
 			this.inventoryId = inventoryId;
 		}
-		public String getInventoryId() {
+		public long getInventoryId() {
 			return inventoryId;
 		}				
 	}
@@ -16,7 +16,7 @@ public final class InventoryCommands {
 	public static class CreateInventoryItem extends InventoryCommand {
 		private final String name;
 
-		public CreateInventoryItem(String inventoryId, String name) {
+		public CreateInventoryItem(long inventoryId, String name) {
 			super(inventoryId);
 			this.name = name;
 		}

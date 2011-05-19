@@ -1,7 +1,9 @@
 package simplejcqrs.events;
 
-public final class HumanEvents {
-	public static class HumanRegistred extends Event {
+import java.io.Serializable;
+
+public final class HumanEvents {	
+	public static class HumanRegistred extends Event implements Serializable {
 		private final String firstName;
 		private final String lastName;
 		public HumanRegistred(String firstName, String lastName) {

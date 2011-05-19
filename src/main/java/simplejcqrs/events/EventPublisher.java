@@ -4,5 +4,5 @@ import com.google.inject.ImplementedBy;
 
 @ImplementedBy(SimpleEventBus.class)
 public interface EventPublisher {
-	void publish(Event event, String aggregateId);
+	void publish(Event event, long aggregateId);
 }

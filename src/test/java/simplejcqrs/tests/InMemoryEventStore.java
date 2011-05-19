@@ -25,7 +25,7 @@ public class InMemoryEventStore implements EventStore {
 			}					
 		}
 		
-		private final Map<String,LinkedList<EventStoreData>> store = new HashMap<String,LinkedList<EventStoreData>>();
+		private final Map<Long,LinkedList<EventStoreData>> store = new HashMap<Long,LinkedList<EventStoreData>>();
 		
 		private static class EventStoreDataIterator implements Iterator<Event> {
 			private final Iterator<EventStoreData> iterator; 
@@ -53,7 +53,7 @@ public class InMemoryEventStore implements EventStore {
 		}
 		
 		public void saveEvents(
-				String aggregateId, Iterable<Event> events,
+				long aggregateId, Iterable<Event> events,
 				int expectedVersion) 
 		{
 			LinkedList<EventStoreData> rootEvents = store.get(aggregateId);
@@ -65,7 +65,7 @@ public class InMemoryEventStore implements EventStore {
 				rootEvents.add(new EventStoreData(event, event.getAggregateVersion()));
 			}
 		}
-		public Iterable<Event> getEvents(String id) {
+		public Iterable<Event> getEvents(long id) {
 			final LinkedList<EventStoreData> rootEvents = store.get(id);
 			if (rootEvents==null) throw new RuntimeException("No aggregate found with id "+id);
 			return new Iterable<Event>() {
@@ -75,10 +75,10 @@ public class InMemoryEventStore implements EventStore {
 				}				
 			};			
 		}
-		public boolean hasEvents(String id) {			
+		public boolean hasEvents(long id) {			
 			return store.containsKey(id);
 		}
-		public boolean checkVersion(String id, int version) {
+		public boolean checkVersion(long id, int version) {
 			final LinkedList<EventStoreData> rootEvents = store.get(id);			
 			return rootEvents != null && rootEvents.getLast().version == version;
 		}
@@ -87,7 +87,7 @@ public class InMemoryEventStore implements EventStore {
 	
 	@Override
 	public void saveEvents(Class<? extends AggregateRoot> rootClass,
-			String aggregateId, Iterable<Event> events, int expectedVersion) {
+			long aggregateId, Iterable<Event> events, int expectedVersion) {
 		AggregateRootStore rootStore = store.get(rootClass);
 		if (rootStore==null) {
 			rootStore = new AggregateRootStore();
@@ -98,20 +98,20 @@ public class InMemoryEventStore implements EventStore {
 	
 	@Override
 	public boolean hasEventsForAggregate(
-			Class<? extends AggregateRoot> rootClass, String id) {
+			Class<? extends AggregateRoot> rootClass, long id) {
 		AggregateRootStore rootStore = store.get(rootClass);		
 		return rootStore != null && rootStore.hasEvents(id);
 	}
 
 	@Override
 	public boolean checkVersion(Class<? extends AggregateRoot> rootClass,
-			String id, int version) {		
+			long id, int version) {		
 		AggregateRootStore rootStore = store.get(rootClass);
 		return rootStore != null && rootStore.checkVersion(id,version);		
 	}
 	@Override	
 	public Iterable<Event> getEventsForAggregate(
-			Class<? extends AggregateRoot> rootClass, String id) 
+			Class<? extends AggregateRoot> rootClass, long id) 
 	{
 		AggregateRootStore rootStore = store.get(rootClass);
 		if (rootStore == null)

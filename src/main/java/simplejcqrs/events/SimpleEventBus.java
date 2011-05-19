@@ -36,7 +36,7 @@ public class SimpleEventBus extends EventBus {
 	private Map<Class<?>,List<Handler> > handlerRegistry = new HashMap<Class<?>,List<Handler>>();
 	
 	@Override
-	public void publish(Event event, String aggregateId) 
+	public void publish(Event event, long aggregateId) 
 	{
 		List<Handler> handlers = handlerRegistry.get(event.getClass());
 		if (handlers == null || handlers.size()==0) return;

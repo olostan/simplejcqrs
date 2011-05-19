@@ -23,7 +23,7 @@ public class PublishingEventStore implements EventStore {
 
 	@Override
 	public void saveEvents(Class<? extends AggregateRoot> rootClass,
-			String aggregateId, Iterable<Event> events,
+			long aggregateId, Iterable<Event> events,
 			int expectedVersion) {
 		/*
 		LinkedList<PublishingEventStore.EventStoreData> rootEvents = current.get(aggregateId);
@@ -49,20 +49,20 @@ public class PublishingEventStore implements EventStore {
 	
 	@Override	
 	public Iterable<Event> getEventsForAggregate(
-			Class<? extends AggregateRoot> rootClass, String id) 
+			Class<? extends AggregateRoot> rootClass, long id) 
 	{
 		return underlying.getEventsForAggregate(rootClass, id);
 	}
 
 	@Override
 	public boolean hasEventsForAggregate(
-			Class<? extends AggregateRoot> rootClass, String id) {
+			Class<? extends AggregateRoot> rootClass, long id) {
 		return underlying.hasEventsForAggregate(rootClass, id);
 	}
 
 	@Override
 	public boolean checkVersion(Class<? extends AggregateRoot> rootClass,
-			String id, int version) {
+			long id, int version) {
 		return underlying.checkVersion(rootClass, id, version);
 	}
 	

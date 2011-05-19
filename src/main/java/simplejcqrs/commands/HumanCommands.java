@@ -4,18 +4,18 @@ import java.io.Serializable;
 
 public final class HumanCommands {
 	public static class HumanCommand extends Command implements Serializable {
-		private String humanId;
+		private long humanId;
 
-		public HumanCommand(String humanId) {
+		public HumanCommand(long humanId) {
 			super();
 			this.humanId = humanId;
 		}
 
-		public String getHumanId() {
+		public long getHumanId() {
 			return humanId;
 		}
 
-		public void setHumanId(String humanId) {
+		public void setHumanId(long humanId) {
 			this.humanId = humanId;
 		}
 
@@ -39,7 +39,7 @@ public final class HumanCommands {
 		public void setLastName(String lastName) {
 			this.lastName = lastName;
 		}
-		public RegisterHuman(String humanId, String firstName, String lastName) {
+		public RegisterHuman(long humanId, String firstName, String lastName) {
 			super(humanId);
 			this.firstName = firstName;
 			this.lastName = lastName;
