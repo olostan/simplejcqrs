@@ -1,6 +1,7 @@
 package simplejcqrs.events;
 
 public final class HouseEvents {
+	@Event.CreationEvent
 	public static class HouseCreated extends Event {
 
 		private final String address;

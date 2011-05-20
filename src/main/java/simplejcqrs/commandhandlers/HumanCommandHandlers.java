@@ -22,4 +22,13 @@ public class HumanCommandHandlers {
 		Human human = new Human(command.getHumanId(),command.getFirstName(), command.getLastName());
         repository.save(human, -1);
 	}
+	@CommandHandler
+	public void handleHumanRenamed(HumanCommands.RenameHuman command) {
+		if (!repository.exists(Human.class, command.getHumanId())) {
+			throw new RuntimeException("Human dows not exists: "+command.getHumanId());
+		}
+		Human human = repository.load(Human.class, command.getHumanId());
+		human.ChangeName(command.getFirstName(), command.getLastName());
+		repository.save(human, command.getOriginalVersion());
+	}
 }

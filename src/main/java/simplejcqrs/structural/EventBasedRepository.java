@@ -1,5 +1,7 @@
 package simplejcqrs.structural;
 
+import java.lang.reflect.InvocationTargetException;
+
 import simplejcqrs.domain.AggregateRoot;
 import simplejcqrs.domain.Repository;
 import simplejcqrs.events.Event;
@@ -21,7 +23,8 @@ public class EventBasedRepository implements Repository {
 	@Override
 	public <T extends AggregateRoot> T load(Class<T> rootClass, long id) {
 		try {
-			T root = rootClass.newInstance();
+			T root = rootClass.getConstructor(Long.class).newInstance(id);
+			//T root = rootClass.newInstance();
 			Iterable<Event> events = store.getEventsForAggregate(rootClass, id);
 			root.loadFromHistory(events);
 			return root;
@@ -31,6 +34,18 @@ public class EventBasedRepository implements Repository {
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 			throw new RuntimeException("Can't create and load aggregate root class: no access",e);
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Can't create aggregate root class: argument",e);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Can't create and load aggregate root class: security",e);			
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Can't create and load aggregate root class: invocation",e);
+		} catch (NoSuchMethodException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Can't create and load aggregate root class: no constructor with long param",e);
 		}			
 	}
 

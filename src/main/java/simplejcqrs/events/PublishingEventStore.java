@@ -35,7 +35,8 @@ public class PublishingEventStore implements EventStore {
 			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": "+rootEvents.getLast().version+" != "+expectedVersion);
 		}*/
 		if (expectedVersion!=-1 && !checkVersion(rootClass, aggregateId, expectedVersion))
-			throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": expecting version "+expectedVersion);		
+			//throw new RuntimeException("Concurrancy exception for aggregate "+rootClass.getName()+": expecting version "+expectedVersion);
+			throw new ConcurrancyException(expectedVersion, rootClass.getName());
 		
 		int versionCounter = expectedVersion;
 		for(Event event : events) {

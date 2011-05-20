@@ -5,6 +5,8 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import javax.management.RuntimeErrorException;
+
 import simplejcqrs.events.Event;
 
 public abstract class AggregateRoot {
@@ -52,11 +54,13 @@ public abstract class AggregateRoot {
 		
 	}
 	private void invokeApplyUsingReflection(Event event) {
+		boolean called = false;
 		for (Method method : this.getClass().getMethods()) {
 			Class<?>[] params = method.getParameterTypes();
 			if (params.length == 1 && params[0] == event.getClass()) {
 				try {
 					method.invoke(this,event);
+					called = true;
 					break;
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
@@ -69,7 +73,9 @@ public abstract class AggregateRoot {
 					throw new RuntimeException("There was error while invoking apply mehtod",e);
 				}				
 			}
-		}		
+		}
+		if (!called && !event.getClass().isAnnotationPresent(Event.CreationEvent.class)) throw new RuntimeException("No apply method in AR "+this.getClass().getSimpleName()+" for event "+event.getClass().getSimpleName());
+		
 	}
 	
 }

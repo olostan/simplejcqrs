@@ -1,6 +1,7 @@
 package simplejcqrs.events;
 
 public final class InventoryEvents {
+	@Event.CreationEvent
 	 public  static class InventoryItemCreated extends Event {
 		public final String name;
 
